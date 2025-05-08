@@ -1,142 +1,134 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Search } from "./components/search"
-import { CurrentWeather } from "./components/current-weather"
-import { WeatherForecast } from "./components/weather-forecast"
-import { WeatherDetails } from "./components/weather-details"
-import { LoadingSpinner } from "./components/loading-spinner"
-import { ErrorDisplay } from "./components/error-display"
-import { getMockWeatherData } from "./utils/mock-data"
-import type { WeatherData } from "./types/weather"
+import Link from "next/link"
+import { BookCard } from "@/components/book-card"
+import { DiscussionPreview } from "@/components/discussion-preview"
+import { Button } from "@/components/ui/button"
+import { Search } from "lucide-react"
 
 export default function Home() {
-  // State for the current city, weather data, loading state, and errors
-  const [city, setCity] = useState<string>("London")
-  const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-  const [useMockData, setUseMockData] = useState<boolean>(false)
+  // Mock data for featured books
+  const featuredBooks = [
+    {
+      id: "1",
+      title: "The Midnight Library",
+      author: "Matt Haig",
+      coverImage: "/placeholder.svg?height=300&width=200",
+      rating: 4.2,
+    },
+    {
+      id: "2",
+      title: "Klara and the Sun",
+      author: "Kazuo Ishiguro",
+      coverImage: "/placeholder.svg?height=300&width=200",
+      rating: 4.1,
+    },
+    {
+      id: "3",
+      title: "Project Hail Mary",
+      author: "Andy Weir",
+      coverImage: "/placeholder.svg?height=300&width=200",
+      rating: 4.5,
+    },
+  ]
 
-  // Fetch weather data when the city changes
-  useEffect(() => {
-    fetchWeatherData(city)
-  }, [city])
-
-  /**
-   * Fetches weather data from the Laravel backend
-   * @param cityName The name of the city to fetch weather data for
-   */
-  const fetchWeatherData = async (cityName: string) => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      // Use environment variable with fallback
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-
-      // Try to fetch from our Laravel backend
-      try {
-        const response = await fetch(`${apiUrl}/api/weather?city=${encodeURIComponent(cityName)}`, {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          // Set a timeout to prevent long waiting times
-          signal: AbortSignal.timeout(5000),
-        })
-
-        // Check if response is OK
-        if (!response.ok) {
-          const contentType = response.headers.get("content-type")
-
-          // If the response is JSON, try to parse the error message
-          if (contentType && contentType.includes("application/json")) {
-            const errorData = await response.json()
-            throw new Error(errorData.error || `Error: ${response.status} ${response.statusText}`)
-          } else {
-            // If not JSON, throw a generic error with status
-            throw new Error(`Server returned ${response.status}: ${response.statusText}`)
-          }
-        }
-
-        // Check if response is JSON
-        const contentType = response.headers.get("content-type")
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Server returned non-JSON response")
-        }
-
-        const data = await response.json()
-        setWeatherData(data)
-        setUseMockData(false)
-      } catch (err) {
-        console.warn("API fetch failed, using mock data:", err)
-
-        // If we're in a preview environment or the API request failed, use mock data
-        const mockData = getMockWeatherData(cityName)
-        setWeatherData(mockData)
-        setUseMockData(true)
-      }
-    } catch (err) {
-      console.error("Error fetching weather data:", err)
-      setError(err instanceof Error ? err.message : "An unknown error occurred")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  /**
-   * Handles the search form submission
-   * @param searchCity The city name from the search form
-   */
-  const handleSearch = (searchCity: string) => {
-    if (searchCity.trim() !== "") {
-      setCity(searchCity)
-    }
-  }
+  // Mock data for recent discussions
+  const recentDiscussions = [
+    {
+      id: "1",
+      title: "Character development in The Midnight Library",
+      bookTitle: "The Midnight Library",
+      author: "BookLover42",
+      commentCount: 24,
+      createdAt: "2 days ago",
+    },
+    {
+      id: "2",
+      title: "Themes of consciousness in Klara and the Sun",
+      bookTitle: "Klara and the Sun",
+      author: "LiteraryExplorer",
+      commentCount: 18,
+      createdAt: "5 days ago",
+    },
+  ]
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-sky-100 to-sky-200 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8 text-sky-800 dark:text-sky-300">Weather App</h1>
-
-        <Search onSearch={handleSearch} />
-
-        {useMockData && (
-          <div className="alert alert-warning mt-4 mb-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="stroke-current shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-            <span>Using mock data. Backend API is not available.</span>
+    <main className="min-h-screen bg-purple-50">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-purple-800 to-purple-600 text-white py-20">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">Welcome to Purple Pages</h1>
+          <p className="text-xl md:text-2xl mb-8">
+            A community for book lovers to share, discover, and discuss their favorite reads
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button className="bg-white text-purple-800 hover:bg-purple-100">Join Now</Button>
+            <Button variant="outline" className="border-white text-white hover:bg-purple-700">
+              Explore Books
+            </Button>
           </div>
-        )}
+        </div>
+      </section>
 
-        {loading ? (
-          <LoadingSpinner />
-        ) : error ? (
-          <ErrorDisplay message={error} />
-        ) : weatherData ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-            <div className="lg:col-span-2">
-              <CurrentWeather data={weatherData.current} city={city} />
-              <WeatherForecast forecast={weatherData.forecast} />
+      {/* Search Section */}
+      <section className="py-8 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="relative max-w-2xl mx-auto">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-purple-400" />
             </div>
-            <div>
-              <WeatherDetails data={weatherData.current} />
-            </div>
+            <input
+              type="text"
+              className="block w-full pl-10 pr-3 py-3 border border-purple-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+              placeholder="Search for books, authors, or discussions..."
+            />
           </div>
-        ) : null}
-      </div>
+        </div>
+      </section>
+
+      {/* Featured Books Section */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-purple-900">Featured Books</h2>
+            <Link href="/books" className="text-purple-700 hover:text-purple-900 font-medium">
+              View All
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredBooks.map((book) => (
+              <BookCard key={book.id} book={book} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Recent Discussions Section */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-purple-900">Recent Discussions</h2>
+            <Link href="/discussions" className="text-purple-700 hover:text-purple-900 font-medium">
+              View All
+            </Link>
+          </div>
+          <div className="space-y-6">
+            {recentDiscussions.map((discussion) => (
+              <DiscussionPreview key={discussion.id} discussion={discussion} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Join Community Section */}
+      <section className="py-16 bg-purple-100">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold text-purple-900 mb-4">Join Our Reading Community</h2>
+          <p className="text-lg text-purple-800 mb-8 max-w-2xl mx-auto">
+            Connect with fellow book lovers, track your reading journey, and participate in thoughtful discussions about
+            your favorite books.
+          </p>
+          <Button className="bg-purple-700 hover:bg-purple-800 text-white">Sign Up Now</Button>
+        </div>
+      </section>
     </main>
   )
 }

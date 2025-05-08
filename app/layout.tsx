@@ -1,25 +1,29 @@
-import type { ReactNode } from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import type React from "react"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
 import "./globals.css"
-import "./utils/abort-controller-polyfill"
 
-const inter = Inter({ subsets: ["latin"] })
-
-export const metadata: Metadata = {
-  title: "Weather App",
-  description: "A modern weather application built with Next.js and Laravel",
+export const metadata = {
+  title: "Purple Pages | Book Club Community",
+  description: "A community for book lovers to share, discover, and discuss their favorite reads",
     generator: 'v0.dev'
 }
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode
+  children: React.ReactNode
 }) {
   return (
-    <html lang="en" data-theme="light">
-      <body className={inter.className}>{children}</body>
+    <html lang="en">
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="light">
+          <Navbar />
+          {children}
+          <Footer />
+        </ThemeProvider>
+      </body>
     </html>
   )
 }

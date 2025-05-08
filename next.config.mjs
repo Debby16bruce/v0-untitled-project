@@ -7,9 +7,8 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["openweathermap.org"],
     unoptimized: true,
   },
 }
 
-module.exports = nextConfig
+export default nextConfig
